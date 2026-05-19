@@ -23,3 +23,9 @@ class BiometricLoginEvent extends AuthEvent {}
 class EnableBiometricEvent extends AuthEvent {}
 
 class LogoutEvent extends AuthEvent {}
+
+/// إشارة أن Home مفتوح — البيانات الحساسة تُقرأ في Home من التخزين الآمن فقط.
+class EnterHomeEvent extends AuthEvent {}
+
+/// مغادرة Home — إعادة الـ Bloc لحالة أولية (التخزين الآمن يبقى حتى logout).
+class LeaveHomeEvent extends AuthEvent {}

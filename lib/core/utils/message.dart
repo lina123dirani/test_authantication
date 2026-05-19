@@ -34,6 +34,15 @@ class ErrorMessages {
   static const String biometricLocked =
       'البصمة مقفلة مؤقتاً بسبب محاولات خاطئة. انتظري قليلاً أو استخدمي قفل الشاشة';
 
+  static const String biometricEnrollmentChanged =
+      'تم تغيير بصمة الجهاز (إضافة أو حذف). سجّل دخولك بالإيميل من جديد لأسباب أمنية';
+
+  static const String biometricSessionNeedsRefresh =
+      'انتهت صلاحية جلسة البصمة. سجّل دخولك بالإيميل ثم فعّلي البصمة من جديد';
+
+  static const String compromisedRuntime =
+      'بيئة الجهاز غير آمنة. لا يمكن متابعة العملية.';
+
   static String forBiometricStatus(BiometricStatus status) {
     switch (status) {
       case BiometricStatus.ready:

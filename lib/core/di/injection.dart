@@ -6,26 +6,26 @@ import 'package:authantication/features/auth/data/repositories/auth_repository_i
 import 'package:authantication/features/auth/domain/repositories/auth_repository.dart';
 import 'package:authantication/features/auth/domain/usecase/auth_usecase.dart';
 import 'package:authantication/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:authantication/services/biometric/biometric_enrollment_marker.dart';
 import 'package:authantication/services/biometric/biometric_service.dart';
 import 'package:authantication/services/biometric/local_auth_biometric_service.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 
 final getIt = GetIt.instance;
 
 Future<void> configureDependencies() async {
   // ---------------- Secure storage ----------------
-  getIt.registerLazySingleton<FlutterSecureStorage>(
-    () => const FlutterSecureStorage(),
-  );
-
   getIt.registerLazySingleton<SecureStorageHelper>(
-    () => SecureStorageHelper(getIt<FlutterSecureStorage>()),
+    SecureStorageHelper.create,
   );
 
   // ---------------- Biometric ----------------
   getIt.registerLazySingleton<BiometricService>(
     () => LocalAuthBiometricService(),
+  );
+
+  getIt.registerLazySingleton<BiometricEnrollmentMarker>(
+    () => PlatformBiometricEnrollmentMarker(),
   );
 
   // ---------------- Auth ----------------
@@ -34,7 +34,10 @@ Future<void> configureDependencies() async {
   );
 
   getIt.registerLazySingleton<AuthLocalDataSource>(
-    () => AuthLocalDataSourceImpl(getIt<SecureStorageHelper>()),
+    () => AuthLocalDataSourceImpl(
+      getIt<SecureStorageHelper>(),
+      getIt<BiometricEnrollmentMarker>(),
+    ),
   );
 
   getIt.registerLazySingleton<AuthRepository>(

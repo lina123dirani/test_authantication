@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:authantication/core/utils/message.dart';
 import 'package:authantication/features/auth/domain/entity/login_entity.dart';
-import 'package:authantication/features/auth/domain/entity/login_response_entity.dart';
 import 'package:authantication/features/auth/domain/entity/session_info_entity.dart';
 import 'package:authantication/features/auth/domain/usecase/auth_usecase.dart';
 import 'package:bloc/bloc.dart';
@@ -14,6 +13,7 @@ part 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthUseCase useCase;
 
+  /// غير حساس — فقط hasSession و canUseBiometric.
   SessionInfoEntity? sessionInfo;
 
   AuthBloc({required this.useCase}) : super(AuthInitial()) {
@@ -22,6 +22,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<BiometricLoginEvent>(_biometricLogin);
     on<EnableBiometricEvent>(_enableBiometric);
     on<LogoutEvent>(_logout);
+    on<EnterHomeEvent>(_enterHome);
+    on<LeaveHomeEvent>(_leaveHome);
+  }
+
+  /// إشارة أن Home مفتوح — بدون بيانات حساسة في الـ state.
+  FutureOr<void> _enterHome(EnterHomeEvent event, Emitter<AuthState> emit) {
+    emit(const HomeActiveState());
+  }
+
+  FutureOr<void> _leaveHome(LeaveHomeEvent event, Emitter<AuthState> emit) {
+    emit(AuthInitial());
   }
 
   FutureOr<void> _checkSession(
@@ -60,12 +71,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           ),
         );
       },
-      (success) async {
-        sessionInfo = SessionInfoEntity(
+      (_) async {
+        sessionInfo = const SessionInfoEntity(
           hasSession: true,
           canUseBiometric: false,
         );
-        emit(LoginSuccessState(user: success));
+        emit(const LoginSuccessState());
       },
     );
   }
@@ -86,8 +97,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           ),
         );
       },
-      (success) async {
-        emit(BiometricLoginSuccessState(user: success));
+      (_) async {
+        sessionInfo = SessionInfoEntity(
+          hasSession: true,
+          canUseBiometric: true,
+        );
+        emit(const BiometricLoginSuccessState());
       },
     );
   }
@@ -109,7 +124,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
       },
       (_) async {
-        sessionInfo = SessionInfoEntity(
+        sessionInfo = const SessionInfoEntity(
           hasSession: true,
           canUseBiometric: true,
         );
@@ -121,23 +136,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   FutureOr<void> _logout(LogoutEvent event, Emitter<AuthState> emit) async {
     emit(LogoutLoadingState());
 
-    final result = await useCase.logout();
+    await useCase.logout();
 
-    await result.fold<Future<void>>(
-      (failure) async {
-        emit(
-          LogoutErrorState(
-            message: failure.message ?? ErrorMessages.unKnownError,
-          ),
-        );
-      },
-      (_) async {
-        sessionInfo = const SessionInfoEntity(
-          hasSession: false,
-          canUseBiometric: false,
-        );
-        emit(LogoutSuccessState());
-      },
+    sessionInfo = const SessionInfoEntity(
+      hasSession: false,
+      canUseBiometric: false,
     );
+    emit(LogoutSuccessState());
   }
 }

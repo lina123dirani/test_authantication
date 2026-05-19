@@ -25,39 +25,42 @@ class CheckSessionErrorState extends AuthState {
   final String message;
 
   const CheckSessionErrorState({required this.message});
+
+  @override
+  List<Object?> get props => [message];
 }
 
 // ---------------------- login ------------------
 class LoginLoadingState extends AuthState {}
 
+/// إشارة نجاح فقط — البيانات الحساسة في التخزين الآمن فقط.
 class LoginSuccessState extends AuthState {
-  final LoginResponseEntity user;
-
-  const LoginSuccessState({required this.user});
-
-  @override
-  List<Object?> get props => [user];
+  const LoginSuccessState();
 }
 
 class LoginErrorState extends AuthState {
   final String message;
 
   const LoginErrorState({required this.message});
+
+  @override
+  List<Object?> get props => [message];
 }
 
 // ---------------------- biometric login ------------------
 class BiometricLoginLoadingState extends AuthState {}
 
 class BiometricLoginSuccessState extends AuthState {
-  final LoginResponseEntity user;
-
-  const BiometricLoginSuccessState({required this.user});
+  const BiometricLoginSuccessState();
 }
 
 class BiometricLoginErrorState extends AuthState {
   final String message;
 
   const BiometricLoginErrorState({required this.message});
+
+  @override
+  List<Object?> get props => [message];
 }
 
 // ---------------------- enable biometric ------------------
@@ -71,6 +74,14 @@ class EnableBiometricErrorState extends AuthState {
   final String message;
 
   const EnableBiometricErrorState({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}
+
+// ---------------------- Home (إشارة فقط — بدون توكن ولا مستخدم) ------------------
+class HomeActiveState extends AuthState {
+  const HomeActiveState();
 }
 
 // ---------------------- logout ------------------
@@ -82,4 +93,7 @@ class LogoutErrorState extends AuthState {
   final String message;
 
   const LogoutErrorState({required this.message});
+
+  @override
+  List<Object?> get props => [message];
 }

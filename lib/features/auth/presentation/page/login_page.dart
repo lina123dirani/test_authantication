@@ -4,7 +4,6 @@ import 'package:authantication/core/utils/auth_validator.dart';
 import 'package:authantication/core/utils/validation_messages.dart';
 import 'package:authantication/features/auth/data/datasource/auth_mock_data_source.dart';
 import 'package:authantication/features/auth/domain/entity/login_entity.dart';
-import 'package:authantication/features/auth/domain/entity/login_response_entity.dart';
 import 'package:authantication/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:authantication/features/auth/presentation/page/home_page.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +26,6 @@ class _LoginPageState extends State<LoginPage> {
   );
 
   bool _canUseBiometric = false;
-  LoginResponseEntity? _pendingSession;
 
   @override
   void dispose() {
@@ -61,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              _goHome();
+              _openHome();
             },
             child: const Text('لاحقاً'),
           ),
@@ -77,13 +75,9 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void _goHome({LoginResponseEntity? session}) {
-    final resolved = session ?? _pendingSession;
-
-    if (resolved == null) return;
-
+  void _openHome() {
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => HomePage(session: resolved)),
+      MaterialPageRoute(builder: (_) => const HomePage()),
     );
   }
 
@@ -99,13 +93,19 @@ class _LoginPageState extends State<LoginPage> {
             });
           }
 
+          if (state is CheckSessionErrorState) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
+            setState(() => _canUseBiometric = false);
+          }
+
           if (state is LoginSuccessState) {
-            _pendingSession = state.user;
             _showEnableBiometricDialog();
           }
 
           if (state is BiometricLoginSuccessState) {
-            _goHome(session: state.user);
+            _openHome();
           }
 
           if (state is EnableBiometricSuccessState) {
@@ -113,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('تم تفعيل البصمة')),
             );
-            _goHome();
+            _openHome();
           }
 
           if (state is LoginErrorState ||

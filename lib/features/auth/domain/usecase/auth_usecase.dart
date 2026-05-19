@@ -3,6 +3,7 @@ import 'package:authantication/core/utils/auth_validator.dart';
 import 'package:authantication/features/auth/domain/entity/login_entity.dart';
 import 'package:authantication/features/auth/domain/entity/login_response_entity.dart';
 import 'package:authantication/features/auth/domain/entity/session_info_entity.dart';
+import 'package:authantication/features/auth/domain/entity/user_display_entity.dart';
 import 'package:authantication/features/auth/domain/repositories/auth_repository.dart';
 import 'package:dartz/dartz.dart';
 
@@ -39,7 +40,13 @@ class AuthUseCase {
     return repository.getSessionInfo();
   }
 
-  Future<Either<Failure, Unit>> logout() {
-    return repository.logout();
+  /// للعرض في Home — من التخزين الآمن؛ الاسم والبريد فقط (بدون توكن في الذاكرة طويلاً).
+  Future<Either<Failure, UserDisplayEntity>> getStoredUserProfile() {
+    return repository.getStoredUserProfile();
+  }
+
+  /// يمسح التخزين المحلي دائماً — بدون اعتماد على الشبكة.
+  Future<void> logout() async {
+    await repository.logout();
   }
 }

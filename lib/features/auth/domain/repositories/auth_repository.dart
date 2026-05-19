@@ -2,6 +2,7 @@ import 'package:authantication/core/error/failure.dart';
 import 'package:authantication/features/auth/domain/entity/login_entity.dart';
 import 'package:authantication/features/auth/domain/entity/login_response_entity.dart';
 import 'package:authantication/features/auth/domain/entity/session_info_entity.dart';
+import 'package:authantication/features/auth/domain/entity/user_display_entity.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class AuthRepository {
@@ -13,5 +14,8 @@ abstract class AuthRepository {
 
   Future<Either<Failure, SessionInfoEntity>> getSessionInfo();
 
-  Future<Either<Failure, Unit>> logout();
+  /// للعرض في Home — الاسم والبريد فقط، بدون توكن في الـ API العام.
+  Future<Either<Failure, UserDisplayEntity>> getStoredUserProfile();
+
+  Future<void> logout();
 }

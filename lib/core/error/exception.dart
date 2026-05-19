@@ -15,3 +15,9 @@ class BiometricException implements Exception {
 
   BiometricException([this.message]);
 }
+
+class SecurityException implements Exception {
+  final String? message;
+
+  SecurityException([this.message]);
+}
