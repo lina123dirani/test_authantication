@@ -48,3 +48,8 @@ android {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    // مطلوب لـ R8 مع minifyEnabled — Flutter يشير لـ Play Core (deferred components)
+    implementation("com.google.android.play:core:1.10.3")
+}
